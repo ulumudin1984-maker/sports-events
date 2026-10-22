@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPORTS EVENTS — PLAY, LEARN, AND WIN!</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sky: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                        },
+                        mint: {
+                            400: '#34d399',
+                            500: '#10b981',
+                        },
+                        sunshine: {
+                            400: '#facc15',
+                            500: '#eab308',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .card-perspective { perspective: 1000px; }
+        .card-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+        .card-flipped { transform: rotateY(180deg); }
+        .card-front, .card-back { backface-visibility: hidden; position: absolute; top:0; left:0; width:100%; height:100%; }
+        .card-back { transform: rotateY(180deg); }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-sky-50 text-slate-800 antialiased min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+const { useState, useEffect, useRef, useMemo } = React;
+
+// Static Initial Materials Data
+const INITIAL_MODULES = [
+    {
+        id: 'mod1',
+        title: 'MODULE 1 — SPORTS EVENT VOCABULARY',
+        category: 'Vocabulary',
+        description: 'Mengenal kata-kata kunci yang sering digunakan dalam konteks Sports Events.',
+        vocabularies: [
+            { word: 'Sports Day', meaning: 'Hari olahraga', def: 'A special day for athletic events in school.', ex: 'Our school Sports Day will be held next Friday.' },
+            { word: 'Competition', meaning: 'Perlombaan / Kompetisi', def: 'An event in which people compete against each other.', ex: 'She entered the badminton competition.' },
+            { word: 'Tournament', meaning: 'Turnamen', def: 'A series of contests between multiple competitors.', ex: 'The basketball tournament lasts for three days.' },
+            { word: 'Participant', meaning: 'Peserta', def: 'A person who takes part in something.', ex: 'Over 200 participants joined the relay race.' },
+            { word: 'Venue', meaning: 'Tempat acara', def: 'The place where an event happens.', ex: 'The venue for the football final is the main stadium.' },
+            { word: 'Schedule', meaning: 'Jadwal', def: 'A plan that lists times and events.', ex: 'Please check the match schedule on the board.' },
+            { word: 'Registration', meaning: 'Pendaftaran', def: 'The process of signing up for an event.', ex: 'Registration closes on Wednesday.' },
+            { word: 'Opening ceremony', meaning: 'Upacara pembukaan', def: 'The formal start of an event.', ex: 'The principal gave a speech at the opening ceremony.' },
+            { word: 'Closing ceremony', meaning: 'Upacara penutupan', def: 'The formal end of an event.', ex: 'Prizes were handed out during the closing ceremony.' },
+            { word: 'Referee', meaning: 'Wasit', def: 'An official who enforces rules during a game.', ex: 'The referee blew the whistle to stop the game.' },
+            { word: 'Scoreboard', meaning: 'Papan skor', def: 'A large board displaying the current score.', ex: 'Look at the scoreboard to check the game score.' },
+            { word: 'Prize-giving ceremony', meaning: 'Upacara penyerahan hadiah', def: 'Event where winners receive medals/trophies.', ex: 'Winners gathered for the prize-giving ceremony.' },
+            { word: 'Relay race', meaning: 'Lomba estafet', def: 'A race between teams where members take turns.', ex: 'Our team won the 4x100m relay race!' },
+            { word: 'Teamwork', meaning: 'Kerja sama tim', def: 'Cooperative effort by group members.', ex: 'Good teamwork led them to victory.' },
+            { word: 'Spectator', meaning: 'Penonton', def: 'A person who watches an event.', ex: 'Thousands of spectators cheered for their teams.' },
+            { word: 'Announcement', meaning: 'Pengumuman', def: 'A public notice giving information.', ex: 'Read the announcement about Sports Day rules.' }
+        ]
+    },
+    {
+        id: 'mod2',
+        title: 'MODULE 2 — UNDERSTANDING SPORTS EVENTS',
+        category: 'Event Types',
+        description: 'Memahami berbagai jenis acara olahraga di sekolah beserta tujuan dan penyelenggaraannya.',
+        content: `Our school organizes Sports Day to encourage students to stay active, develop teamwork, and build friendships. 
+Common school sports events include:
+- School Sports Day: Annual multi-sport event.
+- Football Tournament: Inter-class championship.
+- Basketball Competition: 3x3 or standard team games.
+- Badminton Championship: Singles and doubles categories.
+- Relay Race: Track event testing speed & coordination.
+- Interclass Volleyball Competition: Team sport promoting cooperation.`
+    },
+    {
+        id: 'mod3',
+        title: 'MODULE 3 — EVENT ANNOUNCEMENT',
+        category: 'Text Structure',
+        description: 'Memahami struktur teks pengumuman acara olahraga.',
+        structure: [
+            { section: '1. Title', desc: 'The name of the event (e.g., OUR SCHOOL SPORTS DAY 2026).' },
+            { section: '2. Event Details', desc: 'Date, time, and venue/location.' },
+            { section: '3. Participants', desc: 'Target audience who can join.' },
+            { section: '4. Activities', desc: 'What sports or matches will happen.' },
+            { section: '5. Registration', desc: 'How and when to sign up.' },
+            { section: '6. Contact Info', desc: 'Where to ask questions or submit forms.' }
+        ]
+    },
+    {
+        id: 'mod4',
+        title: 'MODULE 4 — FUTURE EXPRESSIONS',
+        category: 'Grammar',
+        description: 'Menggunakan ungkapan masa depan (will, be going to, scheduled to) dalam mengumumkan acara.',
+        rules: [
+            { expr: 'will + Verb 1', usage: 'Spontaneous decision / Formal promise.', ex: 'We will hold the opening ceremony at 8 a.m.' },
+            { expr: 'be going to + Verb 1', usage: 'Planned actions or intentions.', ex: 'Our class is going to participate in the relay race.' },
+            { expr: 'scheduled to + Verb 1', usage: 'Fixed timetable / Official schedule.', ex: 'The basketball final is scheduled to begin at 10 a.m.' }
+        ]
+    },
+    {
+        id: 'mod5',
+        title: 'MODULE 5 — FACTS AND OPINIONS',
+        category: 'Critical Thinking',
+        description: 'Membedakan penyataan fakta (dapat dibuktikan) dan opini (pandangan pribadi).',
+        factEx: 'The event starts at 8 a.m. (Verifiable in schedule)',
+        opinionEx: 'I think the relay race will be the most exciting activity.',
+        phrases: ['In my opinion, ...', 'I think ...', 'I believe ...', 'I prefer ...', 'I agree because ...', 'I disagree because ...']
+    },
+    {
+        id: 'mod6',
+        title: 'MODULE 6 — PLANNING A SPORTS EVENT',
+        category: 'Event Management',
+        description: 'Langkah-langkah merencanakan acara olahraga sekolah.',
+        steps: [
+            '1. Choose the event type',
+            '2. Decide the date and venue',
+            '3. Prepare the activity schedule',
+            '4. Assign responsibilities',
+            '5. Invite participants',
+            '6. Prepare equipment & safety',
+            '7. Conduct the event',
+            '8. Evaluate the event'
+        ]
+    }
+];
+
+const INITIAL_ANNOUNCEMENT = {
+    title: "OUR SCHOOL SPORTS DAY 2026",
+    text: `Attention, students!
+Our school will organize a Sports Day on Friday, 20 November 2026, from 8:00 a.m. to 2:00 p.m. at the school sports field.
+The event will include a relay race, a basketball competition, a badminton tournament, and fun team games.
+All students are invited to participate and support their classmates.
+Please register with your class representative by 13 November 2026.
+Wear comfortable sportswear, follow the safety instructions, and show good sportsmanship.
+Let's make our Sports Day fun, safe, and memorable!`,
+    details: {
+        date: "Friday, 20 November 2026 (8:00 a.m. - 2:00 p.m.)",
+        venue: "School sports field",
+        activities: "Relay race, basketball, badminton, fun team games",
+        participants: "All students",
+        deadline: "13 November 2026"
+    }
+};
+
+const INITIAL_QUIZ_QUESTIONS = [
+    { id: 1, type: 'mc', question: 'What does "venue" mean?', options: ['Event prize', 'Place where an event takes place', 'Event participant', 'Event schedule'], answer: 1, explanation: 'Venue merujuk pada lokasi atau tempat diselenggarakannya suatu acara.' },
+    { id: 2, type: 'mc', question: 'What is the main purpose of an announcement text?', options: ['To inform people about something', 'To tell a fictional story', 'To describe a person\'s appearance', 'To explain a scientific experiment'], answer: 0, explanation: 'Tujuan utama announcement adalah memberikan informasi resmi kepada khalayak.' },
+    { id: 3, type: 'mc', question: 'Complete the sentence: "We ___ organize a relay race next Friday."', options: ['are going to', 'was', 'did', 'has'], answer: 0, explanation: 'Gunakan "are going to" untuk rencana acara masa depan yang telah dijadwalkan.' },
+    { id: 4, type: 'mc', question: 'Which information tells people where the event will happen?', options: ['Venue', 'Registration deadline', 'Participant\'s name', 'Prize'], answer: 0, explanation: 'Venue memberikan keterangan tempat berlangsungnya kegiatan.' },
+    { id: 5, type: 'mc', question: '"In my opinion, the basketball competition will be exciting." This sentence is an example of:', options: ['A fact', 'An opinion', 'A schedule', 'An instruction'], answer: 1, explanation: 'Penggunaan "In my opinion" menandakan bahwa kalimat tersebut adalah pandangan pribadi (opini).' },
+    { id: 6, type: 'mc', question: 'Which activity is usually part of an opening ceremony?', options: ['Formally starting the event', 'Announcing the final score only', 'Cleaning the venue after event', 'Registering participants after deadline'], answer: 0, explanation: 'Upacara pembukaan ditujukan untuk secara resmi membuka jalannya acara.' },
+    { id: 7, type: 'mc', question: 'What is a "relay race"?', options: ['A match played with rackets', 'A running race where teammates take turns', 'A swimming contest in deep water', 'A chess tournament'], answer: 1, explanation: 'Relay race adalah lomba lari estafet antar tim.' },
+    { id: 8, type: 'mc', question: 'Who is a "referee"?', options: ['A spectator in stadium', 'An official who enforces game rules', 'The team leader', 'The trophy creator'], answer: 1, explanation: 'Referee adalah wasit yang bertugas menegakkan aturan pertandingan.' },
+    { id: 9, type: 'mc', question: 'Complete: "The match is scheduled to ___ at 10 a.m."', options: ['begins', 'begin', 'began', 'beginning'], answer: 1, explanation: 'Frasa "scheduled to" diikuti oleh Verb 1 dasar (begin).' },
+    { id: 10, type: 'mc', question: 'Which statement is a FACT regarding Sports Day 2026?', options: ['Basketball is better than badminton.', 'The event will be held on 20 November 2026.', 'The Sports Day will be boring.', 'Yellow team is cooler than Blue team.'], answer: 1, explanation: 'Tanggal pelaksanaan adalah fakta yang tercantum secara resmi.' },
+    { id: 11, type: 'mc', question: 'What should students do before 13 November 2026 for Sports Day?', options: ['Clean the classroom', 'Register with class representative', 'Buy new shoes', 'Go home early'], answer: 1, explanation: 'Sesuai pengumuman, pendaftaran ditutup pada 13 November 2026.' },
+    { id: 12, type: 'mc', question: 'What does "sportsmanship" mean?', options: ['Fair and respectful behavior during sports', 'Winning at all costs', 'Cheating without getting caught', 'Arguing with referee'], answer: 0, explanation: 'Sportsmanship berarti sikap sportif, jujur, dan saling menghargai.' },
+    { id: 13, type: 'mc', question: 'Which section of an announcement answers "Who can join"?', options: ['Title', 'Venue', 'Participants', 'Schedule'], answer: 2, explanation: 'Bagian Participants merincikan siapa saja yang berhak mengikuti acara.' },
+    { id: 14, type: 'mc', question: 'Choose the correct opinion expression:', options: ['The time is 8 a.m.', 'I believe this tournament will build good teamwork.', 'The venue is at the sports field.', 'Friday is a weekday.'], answer: 1, explanation: '"I believe..." mengungkapkan pendapat pribadi seseorang.' },
+    { id: 15, type: 'mc', question: 'What is the function of a "scoreboard"?', options: ['To sell tickets', 'To show current match scores', 'To store sports balls', 'To play music'], answer: 1, explanation: 'Papan skor digunakan untuk menampilkan hasil skor pertandingan secara langsung.' },
+    { id: 16, type: 'mc', question: 'If you want to announce a future event using formal scheduled time, use:', options: ['scheduled to', 'yesterday', 'last week', 'was happening'], answer: 0, explanation: '"scheduled to" menyatakan waktu terstruktur resmi di masa depan.' },
+    { id: 17, type: 'mc', question: 'What is "Registration"?', options: ['The process of signing up for an event', 'Giving prizes to winners', 'The end of a football match', 'A break time during games'], answer: 0, explanation: 'Registration adalah proses mendaftarkan diri.' },
+    { id: 18, type: 'mc', question: 'Which of the following expresses a FUTURE plan?', options: ['We attended Sports Day last year.', 'We are going to participate in the badminton match.', 'We were running on the track.', 'We play games everyday.'], answer: 1, explanation: '"are going to participate" menyatakan rencana di masa depan.' },
+    { id: 19, type: 'mc', question: 'What is a "spectator"?', options: ['A person who plays on the court', 'A person who watches the game', 'A person who refs the match', 'A coach'], answer: 1, explanation: 'Spectator adalah penonton acara pertandingan.' },
+    { id: 20, type: 'mc', question: 'What is the final step in planning a sports event?', options: ['Choose event type', 'Invite participants', 'Evaluate the event', 'Prepare schedule'], answer: 2, explanation: 'Langkah terakhir dari manajemen event adalah melakukan evaluasi kegiatan.' }
+];
+
+const INITIAL_LEADERBOARD = [
+    { rank: 1, nickname: 'Budi_Runner', xp: 1850, level: 'Sports Champion', badgesCount: 6, activities: 12, isSample: true },
+    { rank: 2, nickname: 'Siti_Smash', xp: 1420, level: 'Pro Organizer', badgesCount: 5, activities: 10, isSample: true },
+    { rank: 3, nickname: 'Doni_Dunk', xp: 1100, level: 'Pro Organizer', badgesCount: 4, activities: 8, isSample: true },
+    { rank: 4, nickname: 'Nia_Relay', xp: 850, level: 'Challenger', badgesCount: 3, activities: 6, isSample: true },
+    { rank: 5, nickname: 'Rizky_Goal', xp: 600, level: 'Challenger', badgesCount: 2, activities: 4, isSample: true }
+];
+
+function App() {
+    // Navigation State
+    const [currentView, setCurrentView] = useState('home');
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // User Profile & Gamification State
+    const [userNickname, setUserNickname] = useState(() => localStorage.getItem('se_nickname') || 'Guest Student');
+    const [xp, setXp] = useState(() => parseInt(localStorage.getItem('se_xp')) || 0);
+    const [completedActivities, setCompletedActivities] = useState(() => JSON.parse(localStorage.getItem('se_completed')) || []);
+    const [unlockedBadges, setUnlockedBadges] = useState(() => JSON.parse(localStorage.getItem('se_badges')) || []);
+    const [lastQuizScore, setLastQuizScore] = useState(() => localStorage.getItem('se_last_quiz') || null);
+
+    // Dynamic Data States (Managed via Teacher Dashboard)
+    const [modules, setModules] = useState(() => JSON.parse(localStorage.getItem('se_modules')) || INITIAL_MODULES);
+    const [announcementData, setAnnouncementData] = useState(() => JSON.parse(localStorage.getItem('se_announcement')) || INITIAL_ANNOUNCEMENT);
+    const [quizQuestions, setQuizQuestions] = useState(() => JSON.parse(localStorage.getItem('se_quiz_q')) || INITIAL_QUIZ_QUESTIONS);
+    const [videoUrl, setVideoUrl] = useState(() => localStorage.getItem('se_video_url') || 'https://www.youtube.com/embed/dQw4w9WgXcQ');
+    const [objectivesStatus, setObjectivesStatus] = useState(() => JSON.parse(localStorage.getItem('se_obj_status')) || [false, false, false, false, false]);
+
+    // Toast/Alert System
+    const [toastMessage, setToastMessage] = useState(null);
+
+    const showToast = (msg, type = 'info') => {
+        setToastMessage({ text: msg, type });
+        setTimeout(() => setToastMessage(null), 3500);
+    };
+
+    // Calculate Level based on XP
+    const userLevel = useMemo(() => {
+        if (xp >= 1500) return 'Sports Champion';
+        if (xp >= 1000) return 'Pro Organizer';
+        if (xp >= 500) return 'Challenger';
+        return 'Rookie';
+    }, [xp]);
+
+    // XP & Badge Manager function
+    const awardXp = (amount, activityId, badgeName = null) => {
+        let newXp = xp;
+        let updatedActivities = [...completedActivities];
+        
+        if (!completedActivities.includes(activityId)) {
+            newXp += amount;
+            updatedActivities.push(activityId);
+            setXp(newXp);
+            setCompletedActivities(updatedActivities);
+            localStorage.setItem('se_xp', newXp.toString());
+            localStorage.setItem('se_completed', JSON.stringify(updatedActivities));
+            showToast(`+${amount} XP Gained! Great job!`, 'success');
+            
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 80, spread: 60, origin: { y: 0.7 } });
+            }
+        } else {
+            showToast(`Activity already completed! Keep practicing.`, 'info');
+        }
+
+        if (badgeName && !unlockedBadges.includes(badgeName)) {
+            const updatedBadges = [...unlockedBadges, badgeName];
+            setUnlockedBadges(updatedBadges);
+            localStorage.setItem('se_badges', JSON.stringify(updatedBadges));
+            showToast(`🏆 Badge Unlocked: ${badgeName}!`, 'success');
+        }
+    };
+
+    // Text-to-Speech Helper
+    const speakText = (text) => {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            window.speechSynthesis.speak(utterance);
+        } else {
+            showToast('Speech synthesis not supported in this browser.', 'warning');
+        }
+    };
+
+    // Persist Nickname
+    const handleSaveNickname = (name) => {
+        setUserNickname(name);
+        localStorage.setItem('se_nickname', name);
+        showToast('Nickname updated!', 'success');
+    };
+
+    // Reset Progress
+    const handleResetData = () => {
+        if (window.confirm("Apakah Anda yakin ingin mereset seluruh progres belajar?")) {
+            localStorage.clear();
+            setXp(0);
+            setCompletedActivities([]);
+            setUnlockedBadges([]);
+            setLastQuizScore(null);
+            setModules(INITIAL_MODULES);
+            setAnnouncementData(INITIAL_ANNOUNCEMENT);
+            setQuizQuestions(INITIAL_QUIZ_QUESTIONS);
+            setObjectivesStatus([false, false, false, false, false]);
+            showToast('Seluruh data berhasil direset.', 'info');
+        }
+    };
+
+    // Guidance Mascot Component
+    const MascotGuide = ({ character = 'Alya', message }) => {
+        const mascots = {
+            Alya: { name: 'Alya', role: 'Ketua Panitia Sports Day', color: 'bg-pink-100 text-pink-700 border-pink-300', avatar: '👩‍💼' },
+            Raka: { name: 'Raka', role: 'Koordinator Pertandingan', color: 'bg-blue-100 text-blue-700 border-blue-300', avatar: '🏃‍♂️' },
+            CoachBima: { name: 'Coach Bima', role: 'Mentor Olahraga', color: 'bg-emerald-100 text-emerald-700 border-emerald-300', avatar: '🧢' }
+        };
+        const current = mascots[character] || mascots.Alya;
+
+        return (
+            <div className={`p-4 rounded-2xl border-2 ${current.color} flex items-start space-x-3 shadow-sm mb-6 transition-all`}>
+                <div className="text-3xl p-2 bg-white rounded-xl shadow-inner">{current.avatar}</div>
+                <div>
+                    <div className="flex items-center space-x-2">
+                        <span className="font-bold text-sm">{current.name}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-white bg-opacity-70">{current.role}</span>
+                    </div>
+                    <p className="text-sm mt-1 leading-relaxed font-medium">{message}</p>
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex h-screen overflow-hidden bg-slate-50">
+            {/* Toast Notification */}
+            {toastMessage && (
+                <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg font-semibold text-sm flex items-center space-x-2 transition-all transform translate-y-0 ${
+                    toastMessage.type === 'success' ? 'bg-emerald-500 text-white' :
+                    toastMessage.type === 'warning' ? 'bg-amber-500 text-white' : 'bg-sky-600 text-white'
+                }`}>
+                    <span>{toastMessage.text}</span>
+                </div>
+            )}
+
+            {/* Sidebar Desktop */}
+            <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col`}>
+                <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-sky-500 text-white">
+                    <div className="flex items-center space-x-2">
+                        <div className="bg-white p-2 rounded-xl text-sky-600 font-extrabold text-xl shadow-sm">🏆</div>
+                        <div>
+                            <h1 className="font-bold text-base leading-tight">SPORTS EVENTS</h1>
+                            <p className="text-xs text-sky-100 font-medium">Play, Learn, & Win!</p>
+                        </div>
+                    </div>
+                    <button className="md:hidden text-white" onClick={() => setSidebarOpen(false)}>✕</button>
+                </div>
+
+                {/* Navigation Items */}
+                <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+                    {[
+                        { id: 'home', label: 'Home Dashboard', icon: '🏠' },
+                        { id: 'objectives', label: 'Learning Objectives', icon: '🎯' },
+                        { id: 'materials', label: 'Learning Materials', icon: '📚' },
+                        { id: 'announcement', label: 'Event Announcement', icon: '📢' },
+                        { id: 'video', label: 'Video Learning', icon: '🎥' },
+                        { id: 'flashcards', label: 'Vocabulary Flashcards', icon: '🂠' },
+                        { id: 'dragdrop', label: 'Drag & Drop Challenge', icon: '🧩' },
+                        { id: 'mysterybox', label: 'Mystery Box Game', icon: '🎁' },
+                        { id: 'spinwheel', label: 'Spin The Wheel', icon: '🎡' },
+                        { id: 'quiz', label: 'Interactive Quiz', icon: '📝' },
+                        { id: 'leaderboard', label: 'Leaderboard', icon: '🥇' },
+                        { id: 'reflection', label: 'Reflection & Evaluation', icon: '🪞' },
+                        { id: 'teacher', label: 'Teacher Dashboard', icon: '🧑‍🏫' }
+                    ].map((menu) => (
+                        <button
+                            key={menu.id}
+                            onClick={() => { setCurrentView(menu.id); setSidebarOpen(false); }}
+                            className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                                currentView === menu.id 
+                                ? 'bg-sky-500 text-white shadow-md font-semibold' 
+                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                            }`}
+                        >
+                            <span className="text-lg">{menu.icon}</span>
+                            <span className="truncate">{menu.label}</span>
+                        </button>
+                    ))}
+                </nav>
+
+                {/* User Stats Mini Panel */}
+                <div className="p-3 border-t border-slate-100 bg-slate-50">
+                    <div className="flex items-center space-x-3 bg-white p-2.5 rounded-xl shadow-sm border border-slate-200">
+                        <div className="w-9 h-9 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center font-bold text-amber-700">
+                            ⚽
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-xs font-bold text-slate-800 truncate">{userNickname}</p>
+                            <div className="flex items-center space-x-2 text-[11px] text-slate-500 font-semibold">
+                                <span className="text-sky-600">{xp} XP</span>
+                                <span>•</span>
+                                <span className="text-amber-600">{userLevel}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                {/* Header Navbar */}
+                <header className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center space-x-3">
+                        <button 
+                            className="md:hidden p-2 rounded-lg bg-slate-100 text-slate-600"
+                            onClick={() => setSidebarOpen(true)}
+                        >
+                            ☰
+                        </button>
+                        <div className="flex items-center space-x-2 text-xs md:text-sm font-semibold text-slate-500">
+                            <span>Sports Events</span>
+                            <span>/</span>
+                            <span className="text-sky-600 capitalize font-bold">{currentView}</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                        <span className="hidden sm:inline-block bg-sky-100 text-sky-800 text-xs px-3 py-1 rounded-full font-bold">
+                            SMA/SMK Kelas X — English
+                        </span>
+                    </div>
+                </header>
+
+                {/* Dynamic Main Body Content */}
+                <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50">
+                    <div className="max-w-5xl mx-auto">
+                        {currentView === 'home' && <HomeView setView={setCurrentView} xp={xp} userLevel={userLevel} completedActivities={completedActivities} unlockedBadges={unlockedBadges} lastQuizScore={lastQuizScore} MascotGuide={MascotGuide} userNickname={userNickname} onSaveNickname={handleSaveNickname} />}
+                        {currentView === 'objectives' && <ObjectivesView status={objectivesStatus} setStatus={setObjectivesStatus} MascotGuide={MascotGuide} showToast={showToast} />}
+                        {currentView === 'materials' && <MaterialsView modules={modules} speakText={speakText} MascotGuide={MascotGuide} awardXp={awardXp} />}
+                        {currentView === 'announcement' && <AnnouncementView announcement={announcementData} MascotGuide={MascotGuide} awardXp={awardXp} showToast={showToast} />}
+                        {currentView === 'video' && <VideoView videoUrl={videoUrl} MascotGuide={MascotGuide} awardXp={awardXp} />}
+                        {currentView === 'flashcards' && <FlashcardsView modules={modules} speakText={speakText} MascotGuide={MascotGuide} awardXp={awardXp} />}
+                        {currentView === 'dragdrop' && <DragDropView MascotGuide={MascotGuide} awardXp={awardXp} />}
+                        {currentView === 'mysterybox' && <MysteryBoxView MascotGuide={MascotGuide} awardXp={awardXp} userNickname={userNickname} />}
+                        {currentView === 'spinwheel' && <SpinWheelView MascotGuide={MascotGuide} awardXp={awardXp} />}
+                        {currentView === 'quiz' && <QuizView questions={quizQuestions} awardXp={awardXp} MascotGuide={MascotGuide} setLastQuizScore={setLastQuizScore} />}
+                        {currentView === 'leaderboard' && <LeaderboardView xp={xp} userNickname={userNickname} userLevel={userLevel} unlockedBadges={unlockedBadges} completedActivities={completedActivities} MascotGuide={MascotGuide} />}
+                        {currentView === 'reflection' && <ReflectionView lastQuizScore={lastQuizScore} completedCount={completedActivities.length} MascotGuide={MascotGuide} awardXp={awardXp} showToast={showToast} />}
+                        {currentView === 'teacher' && <TeacherDashboardView modules={modules} setModules={setModules} announcement={announcementData} setAnnouncement={setAnnouncementData} quizQuestions={quizQuestions} setQuizQuestions={setQuizQuestions} videoUrl={videoUrl} setVideoUrl={setVideoUrl} onResetData={handleResetData} showToast={showToast} />}
+                    </div>
+                </main>
+            </div>
+        </div>
+    );
+}
+
+function HomeView({ setView, xp, userLevel, completedActivities, unlockedBadges, lastQuizScore, MascotGuide, userNickname, onSaveNickname }) {
+    const [nameInput, setNameInput] = useState(userNickname);
+    const [isEditingName, setIsEditingName] = useState(false);
+
+    return (
+        <div className="space-y-6">
+            {/* Banner Section */}
+            <div className="bg-gradient-to-r from-sky-400 via-sky-500 to-blue-600 rounded-3xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+                <div className="relative z-10 max-w-2xl">
+                    <span className="inline-block px-3 py-1 bg-white bg-opacity-20 rounded-full text-xs font-bold tracking-wide uppercase mb-3">
+                        English Learning Module
+                    </span>
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">WELCOME TO SPORTS EVENTS!</h1>
+                    <p className="mt-2 text-sky-100 text-sm md:text-base leading-relaxed font-medium">
+                        Get ready to learn English, organize exciting sports events, and become a champion!
+                    </p>
+                    
+                    {/* User Nickname Input */}
+                    <div className="mt-4 flex items-center space-x-2 bg-white bg-opacity-10 p-2 rounded-2xl max-w-sm backdrop-blur-sm">
+                        {isEditingName ? (
+                            <>
+                                <input 
+                                    type="text" 
+                                    value={nameInput} 
+                                    onChange={(e) => setNameInput(e.target.value)}
+                                    className="px-3 py-1.5 rounded-xl text-slate-800 text-sm font-semibold flex-1 outline-none"
+                                    placeholder="Enter Nickname"
+                                />
+                                <button 
+                                    onClick={() => { onSaveNickname(nameInput); setIsEditingName(false); }}
+                                    className="px-3 py-1.5 bg-amber-400 text-slate-900 font-bold text-xs rounded-xl hover:bg-amber-300"
+                                >
+                                    Save
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <span className="text-sm font-bold text-white px-2">👋 Hi, {userNickname}!</span>
+                                <button 
+                                    onClick={() => setIsEditingName(true)}
+                                    className="text-xs bg-white text-sky-700 px-2 py-1 rounded-lg font-bold hover:bg-sky-50 ml-auto"
+                                >
+                                    Change Name
+                                </button>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Quick Navigation Buttons */}
+                    <div className="mt-6 flex flex-wrap gap-3">
+                        <button onClick={() => setView('materials')} className="px-5 py-2.5 bg-amber-400 text-slate-900 rounded-2xl font-extrabold text-sm hover:bg-amber-300 shadow-md transition-all">
+                            📖 START LEARNING
+                        </button>
+                        <button onClick={() => setView('announcement')} className="px-5 py-2.5 bg-white text-sky-700 rounded-2xl font-bold text-sm hover:bg-sky-50 shadow-md transition-all">
+                            📢 EXPLORE ANNOUNCEMENT
+                        </button>
+                        <button onClick={() => setView('mysterybox')} className="px-5 py-2.5 bg-emerald-400 text-slate-900 rounded-2xl font-extrabold text-sm hover:bg-emerald-300 shadow-md transition-all">
+                            🎮 PLAY GAMES
+                        </button>
+                        <button onClick={() => setView('quiz')} className="px-5 py-2.5 bg-pink-500 text-white rounded-2xl font-bold text-sm hover:bg-pink-400 shadow-md transition-all">
+                            📝 TAKE THE QUIZ
+                        </button>
+                    </div>
+                </div>
+
+                {/* Decorative Sport SVGs Background */}
+                <div className="absolute -right-6 -bottom-6 opacity-20 text-9xl pointer-events-none select-none">
+                    🏆⚽🏀
+                </div>
+            </div>
+
+            <MascotGuide 
+                character="Alya" 
+                message="Hi, everyone! Our School Sports Day is coming. Let's prepare the event and learn English together! Selesaikan berbagai aktivitas untuk mengumpulkan XP dan membuka badge!" 
+            />
+
+            {/* Dashboard Progress Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <span className="text-2xl">⚡</span>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">Total XP</p>
+                    <p className="text-xl font-extrabold text-sky-600 mt-1">{xp}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <span className="text-2xl">🎖️</span>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">Current Level</p>
+                    <p className="text-xs font-extrabold text-amber-600 mt-2 bg-amber-50 py-1 rounded-lg">{userLevel}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <span className="text-2xl">✅</span>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">Completed</p>
+                    <p className="text-xl font-extrabold text-emerald-600 mt-1">{completedActivities.length}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <span className="text-2xl">🏆</span>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">Badges</p>
+                    <p className="text-xl font-extrabold text-purple-600 mt-1">{unlockedBadges.length}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <span className="text-2xl">📈</span>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">Quiz Score</p>
+                    <p className="text-xl font-extrabold text-pink-600 mt-1">{lastQuizScore ? `${lastQuizScore}%` : '0%'}</p>
+                </div>
+                <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <span className="text-2xl">🎯</span>
+                    <p className="text-xs text-slate-500 font-semibold mt-1">Target CP</p>
+                    <p className="text-xs font-bold text-slate-700 mt-2 bg-slate-100 py-1 rounded-lg">Fase E Kelas X</p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ObjectivesView({ status, setStatus, MascotGuide, showToast }) {
+    const objectives = [
+        "Identifikasi fungsi sosial, struktur teks, dan unsur kebahasaan teks announcement terkait Sports Events.",
+        "Gunakan vocabulary spesifik dunia olahraga (venue, participant, referee, relay race) dengan tepat.",
+        "Terapkan ungkapan masa depan (will, be going to, scheduled to) dalam mengomunikasikan rencana kegiatan.",
+        "Membedakan pernyataan fakta (fact) dan opini (opinion) dalam teks ulasan / laporan acara olahraga.",
+        "Susun draf perencanaan dan pengumuman Sports Day sekolah secara terstruktur dan santun."
+    ];
+
+    const toggleObjective = (index) => {
+        const nextStatus = [...status];
+        nextStatus[index] = !nextStatus[index];
+        setStatus(nextStatus);
+        localStorage.setItem('se_obj_status', JSON.stringify(nextStatus));
+        showToast(nextStatus[index] ? 'Target ditandai selesai!' : 'Target dibatalkan.', 'info');
+    };
+
+    const completedCount = status.filter(Boolean).length;
+    const progressPercent = Math.round((completedCount / objectives.length) * 100);
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="CoachBima" message="Tujuan Pembelajaran ini disesuaikan dengan CP & ATP Bahasa Inggris SMA Kelas X (Fase E). Centang indikator di bawah setelah Anda menguasai materinya!" />
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-bold text-slate-800">Learning Objectives (Capaian Pembelajaran)</h2>
+                    <span className="text-sm font-extrabold text-sky-600 bg-sky-50 px-3 py-1 rounded-full">{progressPercent}% Mastered</span>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                    <div className="bg-sky-500 h-full transition-all duration-300" style={{ width: `${progressPercent}%` }}></div>
+                </div>
+
+                <div className="space-y-3 pt-2">
+                    {objectives.map((obj, i) => (
+                        <div 
+                            key={i} 
+                            onClick={() => toggleObjective(i)}
+                            className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start space-x-3 ${
+                                status[i] ? 'bg-emerald-50 border-emerald-300' : 'bg-slate-50 border-slate-200 hover:border-sky-300'
+                            }`}
+                        >
+                            <input 
+                                type="checkbox" 
+                                checked={status[i] || false} 
+                                onChange={() => {}} 
+                                className="mt-1 h-5 w-5 text-sky-600 rounded focus:ring-sky-500" 
+                            />
+                            <div className="flex-1">
+                                <p className={`text-sm font-medium leading-relaxed ${status[i] ? 'text-emerald-900 font-semibold line-through opacity-80' : 'text-slate-800'}`}>
+                                    {obj}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function MaterialsView({ modules, speakText, MascotGuide, awardXp }) {
+    const [activeTab, setActiveTab] = useState(modules[0]?.id || 'mod1');
+
+    const currentModule = modules.find(m => m.id === activeTab) || modules[0];
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="Raka" message="Pelajari setiap modul di bawah ini! Jangan lupa dengarkan pengucapan kata-kata Bahasa Inggris menggunakan tombol audio." />
+
+            {/* Tabs Header */}
+            <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-none">
+                {modules.map(mod => (
+                    <button
+                        key={mod.id}
+                        onClick={() => setActiveTab(mod.id)}
+                        className={`px-4 py-2.5 rounded-2xl font-bold text-xs md:text-sm whitespace-nowrap transition-all ${
+                            activeTab === mod.id 
+                            ? 'bg-sky-500 text-white shadow-md' 
+                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                        }`}
+                    >
+                        {mod.category}
+                    </button>
+                ))}
+            </div>
+
+            {/* Module Content Box */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div>
+                    <span className="text-xs font-extrabold uppercase px-3 py-1 bg-amber-100 text-amber-800 rounded-full">
+                        {currentModule.category}
+                    </span>
+                    <h2 className="text-2xl font-extrabold text-slate-800 mt-2">{currentModule.title}</h2>
+                    <p className="text-sm text-slate-600 mt-1">{currentModule.description}</p>
+                </div>
+
+                {/* Module 1 Vocabulary Render */}
+                {currentModule.vocabularies && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {currentModule.vocabularies.map((v, idx) => (
+                            <div key={idx} className="p-4 rounded-2xl bg-sky-50/50 border border-sky-100 flex justify-between items-start space-x-3">
+                                <div className="space-y-1 flex-1">
+                                    <div className="flex items-center space-x-2">
+                                        <span className="font-extrabold text-sky-800 text-base">{v.word}</span>
+                                        <span className="text-xs text-slate-500 font-semibold">({v.meaning})</span>
+                                    </div>
+                                    <p className="text-xs text-slate-700 italic">{v.def}</p>
+                                    <p className="text-xs text-slate-600 font-medium pt-1">Example: "{v.ex}"</p>
+                                </div>
+                                <button 
+                                    onClick={() => speakText(v.word)}
+                                    className="p-2 bg-white rounded-xl text-sky-600 shadow-sm hover:bg-sky-100 border border-sky-200 text-xs font-bold"
+                                    title="Listen pronunciation"
+                                >
+                                    🔊
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Module 2 Event Types Render */}
+                {currentModule.content && (
+                    <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 whitespace-pre-line text-sm text-slate-700 leading-relaxed font-medium">
+                        {currentModule.content}
+                    </div>
+                )}
+
+                {/* Module 3 Announcement Structure Render */}
+                {currentModule.structure && (
+                    <div className="space-y-3">
+                        {currentModule.structure.map((item, i) => (
+                            <div key={i} className="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                                <h4 className="font-bold text-amber-900 text-sm">{item.section}</h4>
+                                <p className="text-xs text-amber-800 mt-1 font-medium">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Module 4 Future Expressions Render */}
+                {currentModule.rules && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {currentModule.rules.map((r, i) => (
+                            <div key={i} className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <span className="font-extrabold text-emerald-800 text-sm">{r.expr}</span>
+                                <p className="text-xs text-emerald-700 mt-1">{r.usage}</p>
+                                <p className="text-xs font-semibold text-emerald-900 mt-2 bg-white p-2 rounded-xl">"{r.ex}"</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Module 5 Facts & Opinions Render */}
+                {currentModule.factEx && (
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200">
+                                <h4 className="font-bold text-blue-900 text-sm">📌 FACT (Fakta)</h4>
+                                <p className="text-xs text-blue-800 mt-1">{currentModule.factEx}</p>
+                            </div>
+                            <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200">
+                                <h4 className="font-bold text-purple-900 text-sm">💭 OPINION (Opini)</h4>
+                                <p className="text-xs text-purple-800 mt-1">{currentModule.opinionEx}</p>
+                            </div>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <h4 className="font-bold text-xs uppercase text-slate-500 mb-2">Common Opinion Expressions:</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {currentModule.phrases.map((p, i) => (
+                                    <span key={i} className="text-xs bg-white px-3 py-1.5 rounded-xl border border-slate-200 font-semibold text-slate-700">
+                                        {p}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Module 6 Steps Render */}
+                {currentModule.steps && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        {currentModule.steps.map((step, i) => (
+                            <div key={i} className="p-3 bg-indigo-50 border border-indigo-200 rounded-2xl text-xs font-bold text-indigo-900">
+                                {step}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Complete Module Button */}
+                <div className="pt-4 border-t border-slate-100 flex justify-end">
+                    <button 
+                        onClick={() => awardXp(100, `module_${currentModule.id}`, 'Vocabulary Explorer')}
+                        className="px-6 py-3 bg-emerald-500 text-white rounded-2xl font-bold text-sm hover:bg-emerald-600 shadow-md transition-all flex items-center space-x-2"
+                    >
+                        <span>Mark Module as Mastered</span>
+                        <span>(+100 XP)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function AnnouncementView({ announcement, MascotGuide, awardXp, showToast }) {
+    const [highlightKey, setHighlightKey] = useState(null);
+    const [userAnswers, setUserAnswers] = useState({ q1: '', q2: '', q3: '', q4: '', q5: '' });
+    const [quizChecked, setQuizChecked] = useState(false);
+
+    const questions = [
+        { id: 'q1', text: '1. When will the event take place?', answerKey: '20 November 2026' },
+        { id: 'q2', text: '2. Where will the event be held?', answerKey: 'school sports field' },
+        { id: 'q3', text: '3. Mention two activities in the announcement.', answerKey: ['relay race', 'basketball', 'badminton', 'team games'] },
+        { id: 'q4', text: '4. Who can participate in this event?', answerKey: 'all students' },
+        { id: 'q5', text: '5. What is the deadline for registration?', answerKey: '13 November 2026' }
+    ];
+
+    const checkComprehension = () => {
+        setQuizChecked(true);
+        awardXp(150, 'announcement_analysis', 'Announcement Expert');
+        showToast('Analisis Pengumuman Selesai! (+150 XP)', 'success');
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="Alya" message="Ini adalah draf pengumuman resmi Sports Day sekolah kita. Klik tombol highlight untuk membedakan struktur informasinya!" />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Announcement Card Display */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-sky-600 uppercase bg-sky-50 px-3 py-1 rounded-full">Sample Announcement Text</span>
+                        <button 
+                            onClick={() => window.print()} 
+                            className="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl font-bold text-slate-700"
+                        >
+                            🖨️ Print / Download
+                        </button>
+                    </div>
+
+                    <div className="p-6 bg-amber-50/60 rounded-2xl border-2 border-dashed border-amber-300 relative space-y-3 font-sans">
+                        <h3 className={`text-xl font-extrabold text-amber-900 text-center ${highlightKey === 'title' ? 'bg-amber-300 p-1 rounded' : ''}`}>
+                            {announcement.title}
+                        </h3>
+                        <div className="text-sm text-amber-950 leading-relaxed font-medium whitespace-pre-line">
+                            {announcement.text}
+                        </div>
+                    </div>
+
+                    {/* Interactive Highlight Controller */}
+                    <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500 uppercase">Interactive Information Highlighter:</p>
+                        <div className="flex flex-wrap gap-2">
+                            {[
+                                { key: 'date', label: '📅 Date & Time' },
+                                { key: 'venue', label: '📍 Venue' },
+                                { key: 'activities', label: '⚽ Activities' },
+                                { key: 'participants', label: '👥 Participants' },
+                                { key: 'deadline', label: '⏳ Registration Deadline' }
+                            ].map(h => (
+                                <button
+                                    key={h.key}
+                                    onClick={() => setHighlightKey(highlightKey === h.key ? null : h.key)}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                                        highlightKey === h.key ? 'bg-sky-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                                    }`}
+                                >
+                                    {h.label}
+                                </button>
+                            ))}
+                        </div>
+                        {highlightKey && (
+                            <div className="p-3 bg-sky-50 border border-sky-200 rounded-xl text-xs text-sky-900 font-bold">
+                                Details: {announcement.details[highlightKey]}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Comprehension Questions */}
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 className="text-lg font-bold text-slate-800">Comprehension Questions</h3>
+                    <p className="text-xs text-slate-500">Jawab pertanyaan berdasarkan teks pengumuman di samping:</p>
+
+                    <div className="space-y-4">
+                        {questions.map((q) => (
+                            <div key={q.id} className="space-y-1.5">
+                                <label className="text-xs font-bold text-slate-700">{q.text}</label>
+                                <input 
+                                    type="text" 
+                                    value={userAnswers[q.id]}
+                                    onChange={(e) => setUserAnswers({ ...userAnswers, [q.id]: e.target.value })}
+                                    placeholder="Tulis jawaban Anda di sini..."
+                                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-sky-400 outline-none"
+                                />
+                                {quizChecked && (
+                                    <p className="text-[11px] text-emerald-600 font-bold bg-emerald-50 p-2 rounded-lg">
+                                        💡 Kunci Jawaban: {Array.isArray(q.answerKey) ? q.answerKey.join(', ') : q.answerKey}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    <button 
+                        onClick={checkComprehension}
+                        className="w-full py-3 bg-sky-500 text-white rounded-2xl font-bold text-sm hover:bg-sky-600 shadow-md transition-all"
+                    >
+                        Submit Answers & Verify
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function VideoView({ videoUrl, MascotGuide, awardXp }) {
+    const [notes, setNotes] = useState(() => localStorage.getItem('se_video_notes') || '');
+
+    const handleSaveNotes = (val) => {
+        setNotes(val);
+        localStorage.setItem('se_video_notes', val);
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="CoachBima" message="Saksikan video pembelajaran di bawah ini untuk memperdalam pemahaman mengenai pengumuman dan istilah Sports Day!" />
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <div className="aspect-video w-full rounded-2xl overflow-hidden bg-slate-900 shadow-inner">
+                    <iframe 
+                        className="w-full h-full"
+                        src={videoUrl} 
+                        title="Sports Event Learning Video"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowFullScreen
+                    ></iframe>
+                </div>
+
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 className="text-xl font-bold text-slate-800">Sports Event & Announcement Overview</h2>
+                        <p className="text-xs text-slate-500 mt-1">Video modul pembelajaran interaktif Bahasa Inggris Kelas X.</p>
+                    </div>
+                    <button 
+                        onClick={() => awardXp(100, 'video_completed', 'Grammar Star')}
+                        className="px-5 py-2.5 bg-emerald-500 text-white rounded-2xl font-bold text-xs hover:bg-emerald-600 shadow-md transition-all"
+                    >
+                        ✓ Mark Video as Completed (+100 XP)
+                    </button>
+                </div>
+
+                {/* Student Notes Section */}
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-700 uppercase">Catatan Pembelajaran Siswa:</label>
+                    <textarea 
+                        rows="4" 
+                        value={notes}
+                        onChange={(e) => handleSaveNotes(e.target.value)}
+                        placeholder="Tulis ringkasan atau poin penting dari video di sini..."
+                        className="w-full p-3 rounded-2xl border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-sky-400 outline-none"
+                    ></textarea>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function FlashcardsView({ modules, speakText, MascotGuide, awardXp }) {
+    const vocabList = useMemo(() => modules[0]?.vocabularies || [], [modules]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [isFlipped, setIsFlipped] = useState(false);
+    const [reviewedCount, setReviewedCount] = useState(0);
+
+    const currentCard = vocabList[currentIndex] || vocabList[0];
+
+    const handleNext = () => {
+        setIsFlipped(false);
+        setCurrentIndex((prev) => (prev + 1) % vocabList.length);
+    };
+
+    const handlePrev = () => {
+        setIsFlipped(false);
+        setCurrentIndex((prev) => (prev - 1 + vocabList.length) % vocabList.length);
+    };
+
+    const handleKnowCard = () => {
+        setReviewedCount(prev => prev + 1);
+        awardXp(20, `flashcard_${currentIndex}`);
+        handleNext();
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="Raka" message="Klik kartu untuk membalikkan jawaban. Uji kosakata Sports Event secara mandiri!" />
+
+            <div className="max-w-xl mx-auto space-y-6">
+                {/* Progress Header */}
+                <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+                    <span>Card {currentIndex + 1} of {vocabList.length}</span>
+                    <span className="bg-sky-100 text-sky-700 px-3 py-1 rounded-full">{reviewedCount} Mastered</span>
+                </div>
+
+                {/* Flip Card Area */}
+                <div 
+                    onClick={() => setIsFlipped(!isFlipped)}
+                    className="h-72 w-full card-perspective cursor-pointer"
+                >
+                    <div className={`w-full h-full card-inner relative rounded-3xl shadow-lg border-2 border-sky-200 bg-white p-8 flex flex-col justify-between items-center text-center ${isFlipped ? 'card-flipped' : ''}`}>
+                        {/* Front Side */}
+                        <div className="card-front flex flex-col justify-between items-center p-6 bg-gradient-to-br from-white to-sky-50 rounded-3xl">
+                            <span className="text-xs font-extrabold uppercase tracking-wider text-sky-500 bg-sky-100 px-3 py-1 rounded-full">English Word</span>
+                            <div className="my-auto">
+                                <h2 className="text-3xl font-extrabold text-slate-800">{currentCard.word}</h2>
+                                <p className="text-xs text-slate-400 mt-2">(Tap card to flip)</p>
+                            </div>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); speakText(currentCard.word); }}
+                                className="p-2 bg-sky-500 text-white rounded-full text-sm font-bold shadow hover:bg-sky-600"
+                            >
+                                🔊 Listen
+                            </button>
+                        </div>
+
+                        {/* Back Side */}
+                        <div className="card-back flex flex-col justify-between items-center p-6 bg-gradient-to-br from-slate-900 to-sky-900 text-white rounded-3xl">
+                            <span className="text-xs font-extrabold uppercase tracking-wider text-amber-400 bg-white/10 px-3 py-1 rounded-full">Meaning & Definition</span>
+                            <div className="my-auto space-y-2">
+                                <h3 className="text-2xl font-bold text-amber-300">{currentCard.meaning}</h3>
+                                <p className="text-xs text-slate-200">{currentCard.def}</p>
+                                <p className="text-xs text-sky-200 italic font-medium">"{currentCard.ex}"</p>
+                            </div>
+                            <span className="text-[11px] text-slate-400">Tap to see word again</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Controls */}
+                <div className="flex items-center justify-between gap-3">
+                    <button onClick={handlePrev} className="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold text-xs hover:bg-slate-100">
+                        ← Previous
+                    </button>
+                    <button onClick={handleKnowCard} className="flex-1 py-2.5 bg-emerald-500 text-white rounded-2xl font-bold text-xs hover:bg-emerald-600 shadow">
+                        I Know This! (+20 XP)
+                    </button>
+                    <button onClick={handleNext} className="px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold text-xs hover:bg-slate-100">
+                        Next →
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function DragDropView({ MascotGuide, awardXp }) {
+    const [gameMode, setGameMode] = useState('mode1'); // mode1: Vocab Match, mode2: Schedule Order
+
+    // Game Mode 1 State
+    const vocabPairs = [
+        { id: '1', word: 'Venue', match: 'The place where an event takes place' },
+        { id: '2', word: 'Participant', match: 'A person who joins an event' },
+        { id: '3', word: 'Referee', match: 'An official who enforces rules' },
+        { id: '4', word: 'Spectator', match: 'A person who watches an event' }
+    ];
+
+    const [selectedWord, setSelectedWord] = useState(null);
+    const [matchedIds, setMatchedIds] = useState([]);
+
+    // Game Mode 2 State
+    const initialSchedule = [
+        'Sports Competitions',
+        'Closing Ceremony',
+        'Opening Ceremony',
+        'Prize-giving Ceremony',
+        'Warm-up Session'
+    ];
+    const correctSchedule = [
+        'Opening Ceremony',
+        'Warm-up Session',
+        'Sports Competitions',
+        'Prize-giving Ceremony',
+        'Closing Ceremony'
+    ];
+    const [userSchedule, setUserSchedule] = useState(initialSchedule);
+    const [scheduleSuccess, setScheduleSuccess] = useState(false);
+
+    const handleMatchClick = (defMatch) => {
+        if (!selectedWord) return;
+        if (selectedWord.match === defMatch) {
+            setMatchedIds([...matchedIds, selectedWord.id]);
+            setSelectedWord(null);
+            if (matchedIds.length + 1 === vocabPairs.length) {
+                awardXp(150, 'dragdrop_vocab_matched');
+            }
+        } else {
+            setSelectedWord(null);
+        }
+    };
+
+    const moveScheduleItem = (index, direction) => {
+        const updated = [...userSchedule];
+        const targetIndex = index + direction;
+        if (targetIndex < 0 || targetIndex >= updated.length) return;
+        const temp = updated[index];
+        updated[index] = updated[targetIndex];
+        updated[targetIndex] = temp;
+        setUserSchedule(updated);
+    };
+
+    const checkScheduleOrder = () => {
+        const isCorrect = JSON.stringify(userSchedule) === JSON.stringify(correctSchedule);
+        setScheduleSuccess(isCorrect);
+        if (isCorrect) {
+            awardXp(150, 'schedule_ordered_correctly');
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="Alya" message="Pilih mode tantangan di bawah! Cocokkan kosakata atau susun urutan acara Sports Day dengan benar!" />
+
+            <div className="flex space-x-2 border-b border-slate-200 pb-2">
+                <button 
+                    onClick={() => setGameMode('mode1')}
+                    className={`px-4 py-2 rounded-2xl font-bold text-xs ${gameMode === 'mode1' ? 'bg-sky-500 text-white' : 'bg-white text-slate-600'}`}
+                >
+                    Mode 1: Vocabulary Matching
+                </button>
+                <button 
+                    onClick={() => setGameMode('mode2')}
+                    className={`px-4 py-2 rounded-2xl font-bold text-xs ${gameMode === 'mode2' ? 'bg-sky-500 text-white' : 'bg-white text-slate-600'}`}
+                >
+                    Mode 2: Arrange Schedule
+                </button>
+            </div>
+
+            {gameMode === 'mode1' ? (
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                    <p className="text-xs text-slate-500 font-semibold">Klik kata di sebelah kiri, lalu klik definisi yang sesuai di sebelah kanan:</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Words Column */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-extrabold uppercase text-slate-400">Words</h4>
+                            {vocabPairs.map((item) => (
+                                <button
+                                    key={item.id}
+                                    disabled={matchedIds.includes(item.id)}
+                                    onClick={() => setSelectedWord(item)}
+                                    className={`w-full p-4 rounded-2xl border text-left font-bold text-sm transition-all ${
+                                        matchedIds.includes(item.id) 
+                                        ? 'bg-emerald-100 border-emerald-300 text-emerald-800 opacity-60' 
+                                        : selectedWord?.id === item.id 
+                                        ? 'bg-sky-500 text-white ring-2 ring-sky-300' 
+                                        : 'bg-slate-50 border-slate-200 hover:border-sky-300 text-slate-800'
+                                    }`}
+                                >
+                                    {item.word} {matchedIds.includes(item.id) && '✓'}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Definitions Column */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-extrabold uppercase text-slate-400">Definitions</h4>
+                            {vocabPairs.map((item) => (
+                                <button
+                                    key={`def_${item.id}`}
+                                    disabled={matchedIds.includes(item.id)}
+                                    onClick={() => handleMatchClick(item.match)}
+                                    className={`w-full p-4 rounded-2xl border text-left font-medium text-xs transition-all ${
+                                        matchedIds.includes(item.id) 
+                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-800 opacity-60' 
+                                        : 'bg-slate-50 border-slate-200 hover:border-sky-300 text-slate-700'
+                                    }`}
+                                >
+                                    {item.match}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            ) : (
+                <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                    <p className="text-xs text-slate-500 font-semibold">Gunakan tombol panah ⬆️ ⬇️ untuk mengurutkan tahapan susunan acara Sports Day yang benar:</p>
+
+                    <div className="space-y-2 max-w-md mx-auto">
+                        {userSchedule.map((item, idx) => (
+                            <div key={idx} className="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                                <span className="font-bold text-xs text-slate-800">{idx + 1}. {item}</span>
+                                <div className="space-x-1">
+                                    <button 
+                                        onClick={() => moveScheduleItem(idx, -1)}
+                                        className="p-1 bg-white border rounded-lg text-xs"
+                                        disabled={idx === 0}
+                                    >
+                                        ⬆️
+                                    </button>
+                                    <button 
+                                        onClick={() => moveScheduleItem(idx, 1)}
+                                        className="p-1 bg-white border rounded-lg text-xs"
+                                        disabled={idx === userSchedule.length - 1}
+                                    >
+                                        ⬇️
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="text-center pt-2">
+                        <button 
+                            onClick={checkScheduleOrder}
+                            className="px-6 py-2.5 bg-sky-500 text-white rounded-2xl font-bold text-xs hover:bg-sky-600 shadow"
+                        >
+                            Verify Order
+                        </button>
+                        {scheduleSuccess && (
+                            <p className="mt-3 text-xs font-bold text-emerald-600">🎉 Urutan sempurna! (+150 XP)</p>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function MysteryBoxView({ MascotGuide, awardXp, userNickname }) {
+    const [openedBoxes, setOpenedBoxes] = useState([]);
+    const [activeBox, setActiveBox] = useState(null);
+    const [selectedAnswer, setSelectedAnswer] = useState(null);
+    const [boxResult, setBoxResult] = useState(null);
+
+    const boxes = [
+        { id: 1, title: 'Box 1', category: 'Vocabulary', q: 'What does "venue" mean in Sports Day context?', options: ['The rule book', 'The location/place where event is held', 'The prize money'], ans: 1, exp: 'Venue merujuk pada lokasi fisik diselenggarakannya kegiatan.' },
+        { id: 2, title: 'Box 2', category: 'Announcement', q: 'Where can you find the exact date in an announcement?', options: ['In the Event Details section', 'In the contact info section', 'In the participant list'], ans: 0, exp: 'Tanggal pelaksanaan berada di bagian Event Details.' },
+        { id: 3, title: 'Box 3', category: 'Future Tense', q: 'Complete: "We ___ hold the relay race tomorrow."', options: ['will', 'was', 'did'], ans: 0, exp: 'Gunakan "will" untuk ungkapan keputusan masa depan.' },
+        { id: 4, title: 'Box 4', category: 'Fact / Opinion', q: 'Is "The basketball match will be the most fun activity" Fact or Opinion?', options: ['Fact', 'Opinion', 'Schedule'], ans: 1, exp: 'Pernyataan yang bersifat subjektif/kesenangan adalah opini.' },
+        { id: 5, title: 'Box 5', category: 'Schedule', q: 'What activity usually happens FIRST in Sports Day?', options: ['Prize-giving', 'Opening ceremony', 'Closing ceremony'], ans: 1, exp: 'Upacara pembukaan (Opening ceremony) dilakukan paling awal.' },
+        { id: 6, title: 'Box 6', category: 'Sportsmanship', q: 'Why is sportsmanship important?', options: ['To win more trophies', 'To show respect and fairness to everyone', 'To make opponents angry'], ans: 1, exp: 'Sportsmanship menjaga kejujuran dan saling menghormati.' }
+    ];
+
+    const handleOpenBox = (box) => {
+        if (openedBoxes.includes(box.id)) return;
+        setActiveBox(box);
+        setSelectedAnswer(null);
+        setBoxResult(null);
+    };
+
+    const handleAnswerSubmit = () => {
+        if (selectedAnswer === null) return;
+        const isCorrect = selectedAnswer === activeBox.ans;
+        setBoxResult(isCorrect);
+        setOpenedBoxes([...openedBoxes, activeBox.id]);
+
+        if (isCorrect) {
+            awardXp(100, `mystery_box_${activeBox.id}`, 'Mystery Box Master');
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="CoachBima" message="SPORTS DAY MYSTERY BOX! Buka kotak misteri di bawah untuk menjawab tantangan spesial. Tiap kotak memberikan +100 XP!" />
+
+            {/* Boxes Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                {boxes.map((b) => (
+                    <button
+                        key={b.id}
+                        disabled={openedBoxes.includes(b.id)}
+                        onClick={() => handleOpenBox(b)}
+                        className={`p-6 rounded-3xl border-2 flex flex-col items-center justify-center space-y-2 transition-all shadow-md ${
+                            openedBoxes.includes(b.id) 
+                            ? 'bg-slate-100 border-slate-300 text-slate-400 opacity-50 cursor-not-allowed' 
+                            : 'bg-gradient-to-b from-amber-300 to-amber-400 border-amber-500 text-slate-900 hover:scale-105'
+                        }`}
+                    >
+                        <span className="text-4xl">{openedBoxes.includes(b.id) ? '📦' : '🎁'}</span>
+                        <span className="font-extrabold text-sm">{b.title}</span>
+                        <span className="text-[10px] bg-white/60 px-2 py-0.5 rounded-full font-bold">{b.category}</span>
+                    </button>
+                ))}
+            </div>
+
+            {/* Active Box Modal */}
+            {activeBox && (
+                <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+                        <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+                            <h3 className="font-extrabold text-slate-800 text-base">🎁 {activeBox.title} — {activeBox.category}</h3>
+                            <button onClick={() => setActiveBox(null)} className="text-slate-400 hover:text-slate-600 font-bold">✕</button>
+                        </div>
+
+                        <p className="text-sm font-bold text-slate-800">{activeBox.q}</p>
+
+                        <div className="space-y-2">
+                            {activeBox.options.map((opt, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setSelectedAnswer(i)}
+                                    className={`w-full p-3 rounded-2xl border text-left text-xs font-semibold transition-all ${
+                                        selectedAnswer === i ? 'bg-sky-500 text-white border-sky-600' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                                    }`}
+                                >
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+
+                        {boxResult === null ? (
+                            <button 
+                                onClick={handleAnswerSubmit}
+                                className="w-full py-3 bg-emerald-500 text-white rounded-2xl font-bold text-xs hover:bg-emerald-600"
+                            >
+                                Submit Answer
+                            </button>
+                        ) : (
+                            <div className="space-y-3 pt-2">
+                                <p className={`text-xs font-bold p-3 rounded-xl ${boxResult ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                                    {boxResult ? '🎉 Jawaban Benar! (+100 XP)' : '❌ Jawaban Kurang Tepat!'}
+                                </p>
+                                <p className="text-xs text-slate-600 font-medium">💡 Penjelasan: {activeBox.exp}</p>
+                                <button 
+                                    onClick={() => setActiveBox(null)}
+                                    className="w-full py-2.5 bg-slate-800 text-white rounded-2xl font-bold text-xs"
+                                >
+                                    Close Box
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+function SpinWheelView({ MascotGuide, awardXp }) {
+    const segments = ['Vocabulary', 'Announcement', 'Future Expr.', 'Fact/Opinion', 'Schedule', 'Sports Trivia', 'Teamwork', 'Bonus XP'];
+    const [spinning, setSpinning] = useState(false);
+    const [selectedSegment, setSelectedSegment] = useState(null);
+    const [rotation, setRotation] = useState(0);
+
+    const spinWheel = () => {
+        if (spinning) return;
+        setSpinning(true);
+        setSelectedSegment(null);
+
+        const randomIndex = Math.floor(Math.random() * segments.length);
+        const degPerSegment = 360 / segments.length;
+        const extraRounds = 5 * 360;
+        const targetDeg = rotation + extraRounds + (360 - (randomIndex * degPerSegment)) - (degPerSegment / 2);
+
+        setRotation(targetDeg);
+
+        setTimeout(() => {
+            setSpinning(false);
+            setSelectedSegment(segments[randomIndex]);
+            awardXp(50, `spin_${Date.now()}`, 'Spin Wheel Champion');
+        }, 3500);
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="Raka" message="Putar Roda Keberuntungan (Spin the Wheel) untuk mendapatkan tantangan acak dan bonus XP!" />
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm text-center space-y-6">
+                {/* Wheel Graphic Container */}
+                <div className="relative w-64 h-64 mx-auto flex items-center justify-center">
+                    {/* Indicator Arrow */}
+                    <div className="absolute -top-3 z-20 text-3xl text-rose-500 font-bold">▼</div>
+                    <div 
+                        className="w-full h-full rounded-full border-4 border-slate-800 shadow-xl overflow-hidden relative transition-transform duration-[3500ms] cubic-bezier(0.15, 0.99, 0.35, 1)"
+                        style={{ transform: `rotate(${rotation}deg)` }}
+                    >
+                        <div className="w-full h-full bg-gradient-to-tr from-sky-400 via-amber-300 to-emerald-400 flex items-center justify-center font-extrabold text-slate-800 text-xs">
+                            🎯 SPIN ME!
+                        </div>
+                    </div>
+                </div>
+
+                <button 
+                    onClick={spinWheel}
+                    disabled={spinning}
+                    className="px-8 py-3 bg-amber-400 text-slate-900 font-extrabold rounded-2xl shadow-md hover:bg-amber-300 disabled:opacity-50 text-sm"
+                >
+                    {spinning ? 'Spinning...' : 'SPIN NOW!'}
+                </button>
+
+                {selectedSegment && (
+                    <div className="p-4 bg-sky-50 border border-sky-200 rounded-2xl max-w-md mx-auto">
+                        <span className="text-xs font-bold text-sky-600 uppercase">Selected Segment:</span>
+                        <h3 className="text-lg font-extrabold text-slate-800">{selectedSegment}</h3>
+                        <p className="text-xs text-slate-600 mt-1">Selamat! Anda menyelesaikan tantangan segmen ini (+50 XP).</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function QuizView({ questions, awardXp, MascotGuide, setLastQuizScore }) {
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [selectedAnswers, setSelectedAnswers] = useState({});
+    const [submitted, setSubmitted] = useState(false);
+
+    const currentQ = questions[currentIndex];
+
+    const handleSelectOption = (optIdx) => {
+        if (submitted) return;
+        setSelectedAnswers({ ...selectedAnswers, [currentIndex]: optIdx });
+    };
+
+    const calculateScore = () => {
+        let correct = 0;
+        questions.forEach((q, idx) => {
+            if (selectedAnswers[idx] === q.answer) correct++;
+        });
+        const percent = Math.round((correct / questions.length) * 100);
+        setSubmitted(true);
+        setLastQuizScore(percent);
+        localStorage.setItem('se_last_quiz', percent.toString());
+
+        if (percent >= 70) {
+            awardXp(300, 'quiz_passed_70', 'Quiz Winner');
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="CoachBima" message="Kuis Evaluasi Terdiri dari 20 Soal Pilihan Ganda. Selesaikan untuk menguji penguasaan materi Sports Events!" />
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                {!submitted ? (
+                    <>
+                        {/* Progress Header */}
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs font-bold text-slate-500">Question {currentIndex + 1} of {questions.length}</span>
+                            <span className="text-xs font-bold bg-sky-100 text-sky-700 px-3 py-1 rounded-full">
+                                Answered: {Object.keys(selectedAnswers).length}/{questions.length}
+                            </span>
+                        </div>
+
+                        {/* Question Box */}
+                        <div className="space-y-4">
+                            <h3 className="text-base md:text-lg font-bold text-slate-800">{currentQ.question}</h3>
+                            <div className="space-y-2">
+                                {currentQ.options.map((opt, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => handleSelectOption(i)}
+                                        className={`w-full p-4 rounded-2xl border text-left text-xs md:text-sm font-semibold transition-all ${
+                                            selectedAnswers[currentIndex] === i 
+                                            ? 'bg-sky-500 text-white border-sky-600 shadow-sm' 
+                                            : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                                        }`}
+                                    >
+                                        <span className="mr-2 font-bold">{String.fromCharCode(65 + i)}.</span> {opt}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Controls */}
+                        <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+                            <button 
+                                disabled={currentIndex === 0}
+                                onClick={() => setCurrentIndex(currentIndex - 1)}
+                                className="px-4 py-2 bg-slate-100 rounded-xl font-bold text-xs disabled:opacity-40"
+                            >
+                                ← Previous
+                            </button>
+
+                            {currentIndex === questions.length - 1 ? (
+                                <button 
+                                    onClick={calculateScore}
+                                    className="px-6 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-xs hover:bg-emerald-600 shadow"
+                                >
+                                    Submit Quiz Final
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => setCurrentIndex(currentIndex + 1)}
+                                    className="px-4 py-2 bg-sky-500 text-white rounded-xl font-bold text-xs hover:bg-sky-600"
+                                >
+                                    Next →
+                                </button>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    /* Results Page */
+                    <div className="space-y-6 text-center">
+                        <div className="p-6 bg-sky-50 rounded-3xl border border-sky-200 max-w-md mx-auto space-y-2">
+                            <span className="text-4xl">🏆</span>
+                            <h2 className="text-2xl font-extrabold text-slate-800">Quiz Completed!</h2>
+                            <p className="text-3xl font-extrabold text-sky-600">
+                                {Math.round((Object.keys(selectedAnswers).filter(k => selectedAnswers[k] === questions[k].answer).length / questions.length) * 100)}%
+                            </p>
+                            <p className="text-xs text-slate-600">
+                                Correct: {Object.keys(selectedAnswers).filter(k => selectedAnswers[k] === questions[k].answer).length} / {questions.length} Questions
+                            </p>
+                        </div>
+
+                        {/* Explanations Review */}
+                        <div className="text-left space-y-4 max-h-96 overflow-y-auto pr-2">
+                            <h4 className="font-bold text-sm text-slate-800">Review Answer Explanations:</h4>
+                            {questions.map((q, idx) => (
+                                <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-1">
+                                    <p className="font-bold text-slate-800">{idx + 1}. {q.question}</p>
+                                    <p className={selectedAnswers[idx] === q.answer ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold'}>
+                                        Your Answer: {q.options[selectedAnswers[idx]] || 'Not Answered'}
+                                    </p>
+                                    <p className="text-slate-600">Correct Answer: {q.options[q.answer]}</p>
+                                    <p className="text-slate-500 italic pt-1">💡 {q.explanation}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        <button 
+                            onClick={() => { setSubmitted(false); setSelectedAnswers({}); setCurrentIndex(0); }}
+                            className="px-6 py-3 bg-sky-500 text-white rounded-2xl font-bold text-xs"
+                        >
+                            Retake Quiz
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function LeaderboardView({ xp, userNickname, userLevel, unlockedBadges, completedActivities, MascotGuide }) {
+    const combinedLeaderboard = useMemo(() => {
+        const currentUserData = {
+            rank: 0,
+            nickname: `${userNickname} (You)`,
+            xp: xp,
+            level: userLevel,
+            badgesCount: unlockedBadges.length,
+            activities: completedActivities.length,
+            isUser: true
+        };
+
+        const list = [...INITIAL_LEADERBOARD, currentUserData];
+        list.sort((a, b) => b.xp - a.xp || b.activities - a.activities);
+        return list.map((item, idx) => ({ ...item, rank: idx + 1 }));
+    }, [xp, userNickname, userLevel, unlockedBadges, completedActivities]);
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="Alya" message="Papan Peringkat (Leaderboard) menampilkan skor XP siswa. Tingkatkan aktivitas belajar untuk meraih posisi puncak!" />
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <h3 className="text-lg font-bold text-slate-800">Sports Events Top Champions</h3>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-slate-200 text-xs text-slate-400 font-bold uppercase">
+                                <th className="p-3">Rank</th>
+                                <th className="p-3">Student Nickname</th>
+                                <th className="p-3">XP Points</th>
+                                <th className="p-3">Level</th>
+                                <th className="p-3">Badges</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-xs font-semibold">
+                            {combinedLeaderboard.map((player) => (
+                                <tr key={player.rank} className={player.isUser ? 'bg-amber-50 font-extrabold text-amber-900' : 'text-slate-700'}>
+                                    <td className="p-3">
+                                        {player.rank === 1 ? '🥇 1' : player.rank === 2 ? '🥈 2' : player.rank === 3 ? '🥉 3' : `#${player.rank}`}
+                                    </td>
+                                    <td className="p-3">{player.nickname}</td>
+                                    <td className="p-3 text-sky-600 font-bold">{player.xp} XP</td>
+                                    <td className="p-3"><span className="bg-slate-100 px-2 py-0.5 rounded-full">{player.level}</span></td>
+                                    <td className="p-3">{player.badgesCount} 🏆</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function ReflectionView({ lastQuizScore, completedCount, MascotGuide, awardXp, showToast }) {
+    const [answers, setAnswers] = useState({
+        q1: '', q2: '', q3: '', q4: '', q5: '', selfRating: 5
+    });
+
+    const handleSaveReflection = () => {
+        localStorage.setItem('se_reflection', JSON.stringify(answers));
+        awardXp(100, 'reflection_submitted', 'Teamwork Hero');
+        showToast('Refleksi berhasil disimpan! (+100 XP)', 'success');
+    };
+
+    return (
+        <div className="space-y-6">
+            <MascotGuide character="CoachBima" message="Isi lembar refleksi mandiri di bawah untuk mereview pencapaian belajar Anda sepanjang materi Sports Events!" />
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <h3 className="text-xl font-bold text-slate-800">Self Reflection & Learning Summary</h3>
+
+                {/* Summary Card */}
+                <div className="grid grid-cols-2 gap-4 bg-sky-50 p-4 rounded-2xl border border-sky-100">
+                    <div>
+                        <p className="text-xs text-slate-500">Latest Quiz Score:</p>
+                        <p className="text-lg font-extrabold text-sky-700">{lastQuizScore ? `${lastQuizScore}%` : 'Not Taken'}</p>
+                    </div>
+                    <div>
+                        <p className="text-xs text-slate-500">Activities Completed:</p>
+                        <p className="text-lg font-extrabold text-emerald-700">{completedCount} Modules/Games</p>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <div>
+                        <label className="text-xs font-bold text-slate-700">1. What new vocabulary did you learn?</label>
+                        <textarea rows="2" value={answers.q1} onChange={(e) => setAnswers({ ...answers, q1: e.target.value })} className="w-full mt-1 p-2.5 rounded-xl border text-xs outline-none focus:ring-2 focus:ring-sky-400" placeholder="Tuliskan kosakata baru..."></textarea>
+                    </div>
+                    <div>
+                        <label className="text-xs font-bold text-slate-700">2. What information should an event announcement include?</label>
+                        <textarea rows="2" value={answers.q2} onChange={(e) => setAnswers({ ...answers, q2: e.target.value })} className="w-full mt-1 p-2.5 rounded-xl border text-xs outline-none focus:ring-2 focus:ring-sky-400" placeholder="Tuliskan komponen announcement..."></textarea>
+                    </div>
+                    <div>
+                        <label className="text-xs font-bold text-slate-700">3. How can students show good sportsmanship?</label>
+                        <textarea rows="2" value={answers.q4} onChange={(e) => setAnswers({ ...answers, q4: e.target.value })} className="w-full mt-1 p-2.5 rounded-xl border text-xs outline-none focus:ring-2 focus:ring-sky-400" placeholder="Pendapat Anda tentang sikap sportif..."></textarea>
+                    </div>
+
+                    <div>
+                        <label className="text-xs font-bold text-slate-700">Self Assessment Rating (1 - 5):</label>
+                        <div className="flex space-x-3 mt-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button 
+                                    key={star} 
+                                    onClick={() => setAnswers({ ...answers, selfRating: star })}
+                                    className={`px-4 py-2 rounded-xl text-xs font-bold ${answers.selfRating === star ? 'bg-amber-400 text-slate-900' : 'bg-slate-100 text-slate-600'}`}
+                                >
+                                    {star} ⭐
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <button 
+                    onClick={handleSaveReflection}
+                    className="w-full py-3 bg-emerald-500 text-white rounded-2xl font-bold text-xs hover:bg-emerald-600 shadow"
+                >
+                    Save Reflection & Finish Learning
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function TeacherDashboardView({ modules, setModules, announcement, setAnnouncement, quizQuestions, setQuizQuestions, videoUrl, setVideoUrl, onResetData, showToast }) {
+    const [editVideo, setEditVideo] = useState(videoUrl);
+
+    const handleSaveTeacherData = () => {
+        setVideoUrl(editVideo);
+        localStorage.setItem('se_video_url', editVideo);
+        showToast('Pengaturan Guru Berhasil Disimpan (Local Mode)', 'success');
+    };
+
+    const exportToCSV = () => {
+        const quizScore = localStorage.getItem('se_last_quiz') || '0';
+        const xp = localStorage.getItem('se_xp') || '0';
+        const nickname = localStorage.getItem('se_nickname') || 'Student';
+        
+        const csvContent = "data:text/csv;charset=utf-8," 
+            + "Nickname,XP_Points,Quiz_Score\n"
+            + `${nickname},${xp},${quizScore}%\n`;
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "student_sports_events_report.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="bg-amber-50 p-4 rounded-2xl border border-amber-300 text-amber-900 text-xs font-bold flex items-center justify-between">
+                <span>🧑‍🏫 Teacher Demo Mode — Data disimpan pada localStorage perangkat ini.</span>
+                <span className="bg-amber-200 px-2 py-1 rounded-lg">Kelas X Bahasa Inggris</span>
+            </div>
+
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+                <h3 className="text-lg font-bold text-slate-800">Pengaturan Video Pembelajaran</h3>
+                <div className="space-y-2">
+                    <label className="text-xs font-bold text-slate-700">URL Embed YouTube Video:</label>
+                    <input 
+                        type="text" 
+                        value={editVideo} 
+                        onChange={(e) => setEditVideo(e.target.value)}
+                        className="w-full p-2.5 rounded-xl border text-xs outline-none focus:ring-2 focus:ring-sky-400"
+                    />
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-100">
+                    <button onClick={handleSaveTeacherData} className="px-5 py-2.5 bg-sky-500 text-white rounded-xl font-bold text-xs hover:bg-sky-600">
+                        Save Teacher Settings
+                    </button>
+                    <button onClick={exportToCSV} className="px-5 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-xs hover:bg-emerald-600">
+                        Export Student Progress (CSV)
+                    </button>
+                    <button onClick={onResetData} className="px-5 py-2.5 bg-rose-500 text-white rounded-xl font-bold text-xs hover:bg-rose-600 ml-auto">
+                        Reset All Demo Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+window.onload = function() {
+    const rootElement = document.getElementById('root');
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
+};
+    </script>
+</body>
+</html>
